@@ -12,3 +12,47 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Admin {
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  updateAt       DateTime @updatedAt
+  email          String   @unique
+  hashedPassword String
+}
+
+model User {
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  updateAt       DateTime @updatedAt
+  email          String   @unique
+  hashedPassword String
+  permission     Int
+}
+
+model Tool {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+  toolName  String
+  works     Work[]   @relation("WorkTools")
+}
+
+model Work {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  updateAt      DateTime @updatedAt
+  order         Int      @unique
+  permission    Int
+  title         String
+  titleEn       String
+  archiveImg    String
+  useTools      Tool[]   @relation("WorkTools")
+  comment       String?
+  url           String?
+  gitUrl        String?
+  role          String
+  singleImgMain String
+  singleImgSub  String
+  singleImgSub2 String?
+}
