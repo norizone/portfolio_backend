@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ToolController } from './tool.controller';
 import { ToolService } from './tool.service';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
+  imports: [PrismaModule],
   controllers: [ToolController],
-  providers: [ToolService]
+  providers: [ToolService],
 })
 export class ToolModule {}
