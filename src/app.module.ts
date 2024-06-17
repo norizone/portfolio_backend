@@ -6,19 +6,20 @@ import { WorkModule } from './work/work.module';
 import { AdminModule } from './admin/admin.module';
 import { ToolModule } from './tool/tool.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }), //グローバルに
+    AuthModule,
     UserModule,
     WorkModule,
     AdminModule,
     ToolModule,
     PrismaModule,
-    AuthModule,
   ],
-  controllers: [AppController, AuthController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

@@ -7,5 +7,6 @@ import { PrismaModule } from 'src/prisma/prisma.module';
   imports: [PrismaModule],
   controllers: [ToolController],
   providers: [ToolService],
+  exports: [ToolService],
 })
 export class ToolModule {}
