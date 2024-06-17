@@ -24,7 +24,7 @@ export class ToolController {
 
   @Get('list')
   getTools(): Promise<Tool[]> {
-    return this.getTools();
+    return this.toolService.getTools();
   }
 
   @Post('create')
