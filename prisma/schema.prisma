@@ -28,7 +28,6 @@ model User {
   email          String   @unique
   hashedPassword String
   permission     Int
-  role           Int
 }
 
 model Tool {
