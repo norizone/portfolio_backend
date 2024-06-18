@@ -42,7 +42,7 @@ model Work {
   createdAt      DateTime  @default(now())
   updateAt       DateTime  @updatedAt
   order          Int       @unique
-  viewPermission USER_ROLE //観覧権限
+  viewPermission USER_ROLE //観覧権限 TODO: 未ログインでも見れるように権限を増やす
   title          String
   titleEn        String
   archiveImg     String
