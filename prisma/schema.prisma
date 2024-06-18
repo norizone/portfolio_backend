@@ -4,6 +4,13 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// ユーザー権限
+enum USER_ROLE {
+  LIMIT_VIEWING
+  ALL_VIEWING
+  ADMIN
+}
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,21 +20,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Admin {
-  id             Int      @id @default(autoincrement())
-  createdAt      DateTime @default(now())
-  updateAt       DateTime @updatedAt
-  email          String   @unique
-  hashedPassword String
-}
-
 model User {
-  id             Int      @id @default(autoincrement())
-  createdAt      DateTime @default(now())
-  updateAt       DateTime @updatedAt
-  email          String   @unique
+  id             Int       @id @default(autoincrement())
+  createdAt      DateTime  @default(now())
+  updateAt       DateTime  @updatedAt
+  email          String    @unique
   hashedPassword String
-  permission     Int
+  permission     USER_ROLE
 }
 
 model Tool {
@@ -39,20 +38,21 @@ model Tool {
 }
 
 model Work {
-  id            Int      @id @default(autoincrement())
-  createdAt     DateTime @default(now())
-  updateAt      DateTime @updatedAt
-  order         Int      @unique
-  permission    Int
-  title         String
-  titleEn       String
-  archiveImg    String
-  useTools      Tool[]   @relation("WorkTools")
-  comment       String?
-  url           String?
-  gitUrl        String?
-  role          String
-  singleImgMain String
-  singleImgSub  String
-  singleImgSub2 String?
+  id             Int       @id @default(autoincrement())
+  createdAt      DateTime  @default(now())
+  updateAt       DateTime  @updatedAt
+  order          Int       @unique
+  viewPermission USER_ROLE //観覧権限
+  title          String
+  titleEn        String
+  archiveImg     String
+  useTools       Tool[]    @relation("WorkTools")
+  comment        String?
+  url            String?
+  islink         Boolean   @default(false)
+  gitUrl         String?
+  role           String
+  singleImgMain  String
+  singleImgSub   String
+  singleImgSub2  String?
 }

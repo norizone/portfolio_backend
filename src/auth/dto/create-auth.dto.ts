@@ -1,11 +1,5 @@
-import { Transform } from 'class-transformer';
-import {
-  IsEmail,
-  IsInt,
-  IsNotEmpty,
-  IsString,
-  MinLength,
-} from 'class-validator';
+import { USER_ROLE } from '@prisma/client';
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 export class CreateAuthDto {
   @IsEmail()
   @IsNotEmpty()
@@ -16,8 +10,7 @@ export class CreateAuthDto {
   @MinLength(5)
   password: string;
 
-  @Transform(({ value }) => parseInt(value, 10))
-  @IsInt()
+  @IsString()
   @IsNotEmpty()
-  permission: number;
+  permission: USER_ROLE;
 }
