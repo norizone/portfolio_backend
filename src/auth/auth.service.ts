@@ -1,5 +1,5 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
-import { Prisma, USER_ROLE } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -59,11 +59,7 @@ export class AuthService {
     return this.generateJwt(user.id, user.email, user.permission);
   }
 
-  async generateJwt(
-    userId: number,
-    email: string,
-    role: USER_ROLE,
-  ): Promise<Jwt> {
+  async generateJwt(userId: number, email: string, role: number): Promise<Jwt> {
     const payload = {
       sub: userId,
       email,
