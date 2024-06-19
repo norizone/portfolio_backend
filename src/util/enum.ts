@@ -1,12 +1,19 @@
 // ユーザー権限
 export enum USER_ROLE {
-  ADMIN = 3,
-  ALL_VIEWING = 2,
   LIMIT_VIEWING = 1,
+  ALL_VIEWING = 2,
+  ADMIN = 3,
 }
 
 // 投稿側観覧権限
-export enum VIEWING_PERMISSION {
-  ALL = 2,
-  LIMIT = 1,
+export enum VIEW_PERMISSION {
+  GUEST = 0,
+  LIMIT = USER_ROLE.LIMIT_VIEWING,
+  ALL = USER_ROLE.ALL_VIEWING,
+  ADMIN = USER_ROLE.ADMIN,
+}
+
+export enum PUBLICATION_STATUS {
+  PUBLIC = 0,
+  PRIVATE = 1,
 }
