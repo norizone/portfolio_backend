@@ -13,21 +13,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Admin {
-  id             Int      @id @default(autoincrement())
-  createdAt      DateTime @default(now())
-  updateAt       DateTime @updatedAt
-  email          String   @unique
-  hashedPassword String
-}
-
 model User {
   id             Int      @id @default(autoincrement())
   createdAt      DateTime @default(now())
   updateAt       DateTime @updatedAt
   email          String   @unique
   hashedPassword String
-  permission     Int
+  permission     Int      @default(1)
 }
 
 model Tool {
@@ -43,7 +35,8 @@ model Work {
   createdAt     DateTime @default(now())
   updateAt      DateTime @updatedAt
   order         Int      @unique
-  permission    Int
+  permission    Int      @default(3)
+  publication   Int      @default(0)
   title         String
   titleEn       String
   archiveImg    String

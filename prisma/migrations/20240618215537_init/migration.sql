@@ -1,22 +1,11 @@
 -- CreateTable
-CREATE TABLE "Admin" (
-    "id" SERIAL NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updateAt" TIMESTAMP(3) NOT NULL,
-    "email" TEXT NOT NULL,
-    "hashedPassword" TEXT NOT NULL,
-
-    CONSTRAINT "Admin_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
     "email" TEXT NOT NULL,
     "hashedPassword" TEXT NOT NULL,
-    "permission" INTEGER NOT NULL,
+    "permission" INTEGER NOT NULL DEFAULT 1,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -37,7 +26,8 @@ CREATE TABLE "Work" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
     "order" INTEGER NOT NULL,
-    "permission" INTEGER NOT NULL,
+    "permission" INTEGER NOT NULL DEFAULT 3,
+    "publication" INTEGER NOT NULL DEFAULT 0,
     "title" TEXT NOT NULL,
     "titleEn" TEXT NOT NULL,
     "archiveImg" TEXT NOT NULL,
@@ -57,9 +47,6 @@ CREATE TABLE "_WorkTools" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
 );
-
--- CreateIndex
-CREATE UNIQUE INDEX "Admin_email_key" ON "Admin"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
