@@ -14,13 +14,13 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { Tool } from '@prisma/client';
 import { Roles } from 'src/auth/decorators/role.decorator';
-import { RolesGuard } from 'src/auth/guards/role.guard';
+import { RolesAdminGuard } from 'src/auth/guards/role-admin.guard';
 import { CreateToolDto } from 'src/tool/dto/create-tool.dto';
 import { UpdateToolDto } from 'src/tool/dto/update-tool.dto';
 import { ToolService } from 'src/tool/tool.service';
 import { USER_ROLE } from 'src/util/enum';
 
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(AuthGuard('jwt'), RolesAdminGuard)
 @Roles(USER_ROLE.ADMIN)
 @Controller('admin/tool')
 export class AdminToolController {
