@@ -10,4 +10,4 @@ import { AuthModule } from './auth/auth.module';
   imports: [PrismaModule, AuthModule, ToolModule, UserModule, WorkModule],
   controllers: [ToolController],
 })
-export class AdminModule {}
+export class FrontModule {}
