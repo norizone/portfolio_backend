@@ -29,6 +29,20 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK) //statusを200番で変えす
+  @Post('logout')
+  logout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Msg {
+    res.cookie('access_token', '', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      path: '/',
+    });
+    return {
+      message: 'ok',
+    };
+  }
+
+  @HttpCode(HttpStatus.OK) //statusを200番で変えす
   @Post('login')
   async login(
     @Body() dto: AuthDto,
@@ -47,9 +61,13 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK) //statusを200番で変えす
-  @Post('logout')
-  logout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Msg {
-    res.cookie('access_token', '', {
+  @Post('admin/login')
+  async adminLogin(
+    @Body() dto: AuthDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<Msg> {
+    const jwt = await this.authService.adminLogin(dto);
+    res.cookie('access_token', jwt.accessToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
