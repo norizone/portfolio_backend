@@ -7,6 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto/auth.dto';
 import { Msg, Jwt } from './interfaces/auth.interface';
 import { CreateAuthDto } from './dto/create-auth.dto';
+import { USER_ROLE } from 'src/util/enum';
 
 @Injectable()
 export class AuthService {
@@ -44,6 +45,25 @@ export class AuthService {
   async login(dto: AuthDto): Promise<Jwt> {
     const user = await this.prisma.user.findUnique({
       where: {
+        email: dto.email,
+      },
+    });
+    if (!user)
+      throw new ForbiddenException(
+        'メールアドレスかパスワードが間違っています。',
+      );
+    const isValid = await bcrypt.compare(dto.password, user.hashedPassword);
+    if (!isValid)
+      throw new ForbiddenException(
+        'メールアドレスかパスワードが間違っています。',
+      );
+    return this.generateJwt(user.id, user.email, user.permission);
+  }
+
+  async adminLogin(dto: AuthDto): Promise<Jwt> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        permission: USER_ROLE.ADMIN,
         email: dto.email,
       },
     });

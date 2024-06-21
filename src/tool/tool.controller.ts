@@ -17,13 +17,18 @@ import { Tool } from '@prisma/client';
 import { CreateToolDto } from './dto/create-tool.dto';
 import { UpdateToolDto } from './dto/update-tool.dto';
 
-// @UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'))
 @Controller('tool')
 export class ToolController {
   constructor(private readonly toolService: ToolService) {}
 
-  @Get('list')
+  @Get('/')
   getTools(): Promise<Tool[]> {
+    return this.toolService.getTools();
+  }
+
+  @Get('/list')
+  getToolList(): Promise<Tool[]> {
     return this.toolService.getTools();
   }
 
