@@ -13,10 +13,6 @@ export class ToolDto {
   @IsInt()
   @IsNotEmpty()
   id: number;
-
-  @IsString()
-  @IsNotEmpty()
-  toolName: string;
 }
 
 export class CreateWorkDto {

@@ -9,35 +9,14 @@ import { CreateWorkDto } from './dto/create-work';
 export class WorkService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getWorkList(
-    dto: WorksList,
-    viewParmission: VIEW_PERMISSION,
-  ): Promise<{
-    items: Pick<Work, 'id' | 'titleEn' | 'archiveImg'>[];
+  async getWorkList(dto: WorksList): Promise<{
+    items: Pick<Work, 'id' | 'title' | 'order' | 'publication'>[];
     totalPages: number;
     totalCount: number;
   }> {
-    const defaltWhere = {
-      permission: {
-        lte: viewParmission,
-      },
-    };
-
-    const where =
-      viewParmission !== VIEW_PERMISSION.ADMIN
-        ? {
-            ...defaltWhere,
-            publication: {
-              in: [PUBLICATION_STATUS.PUBLIC],
-            },
-          }
-        : defaltWhere;
-
-    const { page = 1, limit = 5 } = dto;
-    const skip = (page - 1) * limit;
-    const totalCount = await this.prisma.work.count({
-      where,
-    });
+    const { page = 1, pageSize = 5 } = dto;
+    const skip = Math.max((page - 1) * pageSize, 0);
+    const totalCount = await this.prisma.work.count();
 
     if (totalCount === 0)
       return {
@@ -46,19 +25,18 @@ export class WorkService {
         totalCount: 0,
       };
 
-    const totalPages = Math.ceil(totalCount / limit);
+    const totalPages = Math.ceil(totalCount / pageSize);
     const data = await this.prisma.work.findMany({
       skip,
-      take: limit,
+      take: pageSize,
       orderBy: {
-        order: 'asc',
+        order: 'desc',
       },
-      where,
       select: {
         id: true,
-        titleEn: true,
-        archiveImg: true,
-        useTools: true,
+        title: true,
+        order: true,
+        publication: true,
       },
     });
 
@@ -92,16 +70,12 @@ export class WorkService {
 
   async createWork(dto: CreateWorkDto): Promise<Work> {
     const { useTools, ...rest } = dto;
-    // ToolDtoをToolCreateWithoutWorkInputに変換
-    const useToolsInput = useTools.map((tool) => ({
-      id: tool.id,
-    }));
 
     const work = await this.prisma.work.create({
       data: {
         ...rest,
         useTools: {
-          connect: useToolsInput,
+          connect: useTools,
         },
       },
     });
