@@ -13,6 +13,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Admin {
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  updateAt       DateTime @updatedAt
+  email          String   @unique
+  hashedPassword String
+}
+
 model User {
   id             Int      @id @default(autoincrement())
   createdAt      DateTime @default(now())
@@ -24,6 +32,7 @@ model User {
 
 model Tool {
   id        Int      @id @default(autoincrement())
+  order     Int      @unique @default(autoincrement())
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
   toolName  String
@@ -34,7 +43,7 @@ model Work {
   id            Int      @id @default(autoincrement())
   createdAt     DateTime @default(now())
   updateAt      DateTime @updatedAt
-  order         Int      @unique
+  order         Int      @unique @default(autoincrement())
   permission    Int      @default(3)
   publication   Int      @default(0)
   title         String
