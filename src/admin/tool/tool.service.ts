@@ -28,13 +28,14 @@ export class ToolService {
     return tool;
   }
 
-  async deleatTaskById(toolId: number): Promise<void> {
+  async deleatTooById(toolId: number): Promise<void> {
     const tool = await this.prisma.tool.findUnique({
       where: {
         id: toolId,
       },
     });
-    if (!tool) throw new ForbiddenException('タスクが見つかりませんでした。');
+    if (!tool)
+      throw new ForbiddenException('該当ツールが見つかりませんでした。');
     await this.prisma.tool.delete({
       where: {
         id: toolId,
@@ -48,7 +49,8 @@ export class ToolService {
         id: toolId,
       },
     });
-    if (!tool) throw new ForbiddenException('タスクが見つかりませんでした。');
+    if (!tool)
+      throw new ForbiddenException('該当ツールが見つかりませんでした。');
     return this.prisma.tool.update({
       where: {
         id: toolId,
@@ -61,14 +63,6 @@ export class ToolService {
 
   async updateTools(dto: UpdateToolsDto): Promise<Tool[]> {
     const { tools } = dto;
-    // const ids = dto.tools.map((tool) => tool.id);
-    // const tools = await this.prisma.tool.findMany({
-    //   where: {
-    //     id: {
-    //       in: ids,
-    //     },
-    //   },
-    // });
     const updateTools = tools.map((tool) => {
       return this.prisma.tool.update({
         where: {

@@ -23,7 +23,7 @@ import { UpdateToolsDto } from './dto/update-tools.dto';
 export class ToolController {
   constructor(private readonly toolService: ToolService) {}
 
-  @Get('/list')
+  @Get('list')
   getToolList(): Promise<Pick<Tool, 'id' | 'toolName' | 'order'>[]> {
     return this.toolService.getTools();
   }
@@ -49,6 +49,6 @@ export class ToolController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete('delete/:id')
   deleteTool(@Param('id', ParseIntPipe) toolId: number): Promise<void> {
-    return this.toolService.deleatTaskById(toolId);
+    return this.toolService.deleatTooById(toolId);
   }
 }
