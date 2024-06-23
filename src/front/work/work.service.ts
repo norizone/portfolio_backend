@@ -17,21 +17,14 @@ export class WorkService {
     totalPages: number;
     totalCount: number;
   }> {
-    const defaltWhere = {
+    const where = {
       permission: {
         lte: viewParmission,
+        publication: {
+          in: [PUBLICATION_STATUS.PUBLIC],
+        },
       },
     };
-
-    const where =
-      viewParmission !== VIEW_PERMISSION.ADMIN
-        ? {
-            ...defaltWhere,
-            publication: {
-              in: [PUBLICATION_STATUS.PUBLIC],
-            },
-          }
-        : defaltWhere;
 
     const { page = 1, limit = 5 } = dto;
     const skip = (page - 1) * limit;
