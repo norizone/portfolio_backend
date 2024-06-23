@@ -1,9 +1,10 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Msg } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -33,5 +34,54 @@ export class UserService {
       }
       throw error;
     }
+  }
+
+  async getUsers(): Promise<Pick<User, 'id' | 'email' | 'permission'>[]> {
+    return this.prisma.user.findMany({
+      orderBy: {
+        id: 'asc',
+      },
+      select: {
+        id: true,
+        email: true,
+        permission: true,
+      },
+    });
+  }
+
+  async deleteUser(userId: number): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) throw new ForbiddenException('ユーザーが見つかりませんでした。');
+    await this.prisma.user.delete({
+      where: {
+        id: userId,
+      },
+    });
+  }
+
+  async updateUser(
+    userId: number,
+    dto: UpdateUserDto,
+  ): Promise<Omit<User, 'hashedPassword'>> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) throw new ForbiddenException('ユーザーが見つかりませんでした。');
+    const updateUser = this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        ...dto,
+      },
+    });
+    delete (await updateUser).hashedPassword;
+    return updateUser;
   }
 }
