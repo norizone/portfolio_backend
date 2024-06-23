@@ -3,12 +3,22 @@ import { Tool } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateToolDto } from './dto/update-tool.dto';
 import { CreateToolDto } from './dto/create-tool.dto';
+import { UpdateToolsDto } from './dto/update-tools.dto';
 @Injectable()
 export class ToolService {
   constructor(private prisma: PrismaService) {}
 
-  getTools(): Promise<Tool[]> {
-    return this.prisma.tool.findMany();
+  async getTools(): Promise<Pick<Tool, 'id' | 'toolName' | 'order'>[]> {
+    return this.prisma.tool.findMany({
+      orderBy: {
+        order: 'asc',
+      },
+      select: {
+        id: true,
+        order: true,
+        toolName: true,
+      },
+    });
   }
 
   async createTool(dto: CreateToolDto): Promise<Tool> {
@@ -47,5 +57,29 @@ export class ToolService {
         ...dto,
       },
     });
+  }
+
+  async updateTools(dto: UpdateToolsDto): Promise<Tool[]> {
+    const { tools } = dto;
+    // const ids = dto.tools.map((tool) => tool.id);
+    // const tools = await this.prisma.tool.findMany({
+    //   where: {
+    //     id: {
+    //       in: ids,
+    //     },
+    //   },
+    // });
+    const updateTools = tools.map((tool) => {
+      return this.prisma.tool.update({
+        where: {
+          id: tool.id,
+        },
+        data: {
+          toolName: tool.toolName,
+        },
+      });
+    });
+    const updatedTasks = await Promise.all(updateTools);
+    return updatedTasks;
   }
 }
