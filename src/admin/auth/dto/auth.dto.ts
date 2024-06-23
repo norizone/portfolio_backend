@@ -1,11 +1,4 @@
-// import { Transform } from 'class-transformer';
-import {
-  IsEmail,
-  // IsInt,
-  IsNotEmpty,
-  IsString,
-  MinLength,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 export class AuthDto {
   @IsEmail()
   @IsNotEmpty()
@@ -15,9 +8,4 @@ export class AuthDto {
   @IsNotEmpty()
   @MinLength(5)
   password: string;
-
-  // // @Transform(({ value }) => parseInt(value))
-  // @IsInt()
-  // @IsNotEmpty()
-  // permission: number;
 }

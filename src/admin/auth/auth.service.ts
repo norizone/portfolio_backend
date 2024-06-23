@@ -6,8 +6,6 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto/auth.dto';
 import { Msg, Jwt } from './interfaces/auth.interface';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { USER_ROLE } from 'src/util/enum';
 
 @Injectable()
 export class AuthService {
@@ -17,14 +15,13 @@ export class AuthService {
     private readonly config: ConfigService,
   ) {}
 
-  async createUser(dto: CreateAuthDto): Promise<Msg> {
+  async signUp(dto: AuthDto): Promise<Msg> {
     const hashed = await bcrypt.hash(dto.password, 12);
     try {
-      await this.prisma.user.create({
+      await this.prisma.admin.create({
         data: {
           email: dto.email,
           hashedPassword: hashed,
-          permission: dto.permission,
         },
       });
       return {
@@ -43,7 +40,7 @@ export class AuthService {
   }
 
   async login(dto: AuthDto): Promise<Jwt> {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.admin.findUnique({
       where: {
         email: dto.email,
       },
@@ -57,37 +54,17 @@ export class AuthService {
       throw new ForbiddenException(
         'メールアドレスかパスワードが間違っています。',
       );
-    return this.generateJwt(user.id, user.email, user.permission);
+    return this.generateJwt(user.id, user.email);
   }
 
-  async adminLogin(dto: AuthDto): Promise<Jwt> {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        permission: USER_ROLE.ADMIN,
-        email: dto.email,
-      },
-    });
-    if (!user)
-      throw new ForbiddenException(
-        'メールアドレスかパスワードが間違っています。',
-      );
-    const isValid = await bcrypt.compare(dto.password, user.hashedPassword);
-    if (!isValid)
-      throw new ForbiddenException(
-        'メールアドレスかパスワードが間違っています。',
-      );
-    return this.generateJwt(user.id, user.email, user.permission);
-  }
-
-  async generateJwt(userId: number, email: string, role: number): Promise<Jwt> {
+  async generateJwt(userId: number, email: string): Promise<Jwt> {
     const payload = {
       sub: userId,
       email,
-      role,
     };
     const secret = this.config.get('JTW_SECRET');
     const token = await this.jwt.signAsync(payload, {
-      expiresIn: '5m', // アクセストークン有効期限
+      expiresIn: '1440m', // アクセストークン有効期限
       secret: secret,
     });
     return {

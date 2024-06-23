@@ -12,9 +12,8 @@ import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { Csrf, Msg } from './interfaces/auth.interface';
-import { CreateAuthDto } from './dto/create-auth.dto';
 
-@Controller('auth')
+@Controller('admin/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -23,9 +22,9 @@ export class AuthController {
     return { csrfToken: req.csrfToken() };
   }
 
-  @Post('create_user')
-  createUser(@Body() dto: CreateAuthDto): Promise<Msg> {
-    return this.authService.createUser(dto);
+  @Post('signup')
+  sinnUp(@Body() dto: AuthDto): Promise<Msg> {
+    return this.authService.signUp(dto);
   }
 
   @HttpCode(HttpStatus.OK) //statusを200番で変えす
@@ -49,24 +48,6 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<Msg> {
     const jwt = await this.authService.login(dto);
-    res.cookie('access_token', jwt.accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      path: '/',
-    });
-    return {
-      message: 'ok',
-    };
-  }
-
-  @HttpCode(HttpStatus.OK) //statusを200番で変えす
-  @Post('admin/login')
-  async adminLogin(
-    @Body() dto: AuthDto,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<Msg> {
-    const jwt = await this.authService.adminLogin(dto);
     res.cookie('access_token', jwt.accessToken, {
       httpOnly: true,
       secure: true,
