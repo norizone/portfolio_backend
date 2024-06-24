@@ -2,6 +2,7 @@ import {
   ArrayMinSize,
   IsInt,
   IsNotEmpty,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -16,11 +17,6 @@ export class ToolDto {
 }
 
 export class CreateWorkDto {
-  @Transform(({ value }) => parseInt(value, 10))
-  @IsInt()
-  @IsNotEmpty()
-  order: number;
-
   @Transform(({ value }) => parseInt(value, 10))
   @IsInt()
   @IsNotEmpty()
@@ -48,6 +44,17 @@ export class CreateWorkDto {
   role: string;
 
   @IsString()
+  comment?: string;
+
+  @IsOptional()
+  @IsString()
+  url?: string | null;
+
+  @IsOptional()
+  @IsString()
+  gitUrl?: string | null;
+
+  @IsString()
   @IsNotEmpty()
   singleImgMain: string;
 
@@ -55,17 +62,9 @@ export class CreateWorkDto {
   @IsNotEmpty()
   singleImgSub: string;
 
+  @IsOptional()
   @IsString()
-  comment?: string;
-
-  @IsString()
-  url?: string;
-
-  @IsString()
-  gitUrl?: string;
-
-  @IsString()
-  singleImgSub2?: string;
+  singleImgSub2?: string | null;
 
   @ValidateNested({ each: true })
   @Type(() => ToolDto)

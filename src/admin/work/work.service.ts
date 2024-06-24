@@ -4,6 +4,7 @@ import { WorksList } from './dto/list-work.dto';
 import { Work } from '@prisma/client';
 import { VIEW_PERMISSION, PUBLICATION_STATUS } from 'src/util/enum';
 import { CreateWorkDto } from './dto/create-work';
+import { uploadImagePath } from './interfaces/work.interface';
 
 @Injectable()
 export class WorkService {
@@ -68,9 +69,27 @@ export class WorkService {
     return data[0];
   }
 
+  async uploadWorkImage(files: {
+    archiveImg?: Express.Multer.File[];
+    singleImgMain?: Express.Multer.File[];
+    singleImgSub?: Express.Multer.File[];
+    singleImgSub2?: Express.Multer.File[];
+  }): Promise<uploadImagePath> {
+    const { archiveImg, singleImgMain, singleImgSub, singleImgSub2 } = files;
+    const archiveImgPath = archiveImg ? archiveImg[0].path : null;
+    const singleImgMainPath = singleImgMain ? singleImgMain[0].path : null;
+    const singleImgSubPath = singleImgSub ? singleImgSub[0].path : null;
+    const singleImgSub2Path = singleImgSub2 ? singleImgSub2[0].path : null;
+    return {
+      archiveImg: archiveImgPath,
+      singleImgMain: singleImgMainPath,
+      singleImgSub: singleImgSubPath,
+      singleImgSub2: singleImgSub2Path,
+    };
+  }
+
   async createWork(dto: CreateWorkDto): Promise<Work> {
     const { useTools, ...rest } = dto;
-
     const work = await this.prisma.work.create({
       data: {
         ...rest,
