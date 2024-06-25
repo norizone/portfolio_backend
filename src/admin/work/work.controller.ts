@@ -1,6 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
+  ParseIntPipe,
   Post,
   UploadedFiles,
   UseGuards,
@@ -19,13 +22,18 @@ import { uploadImagePath } from './interfaces/work.interface';
 export class WorkController {
   constructor(private readonly workService: WorkService) {}
 
-  @Post('/list')
+  @Post('list')
   getWorks(@Body() dto: WorksList): Promise<{
     items: Pick<Work, 'id' | 'title' | 'order' | 'publication'>[];
     totalPages: number;
     totalCount: number;
   }> {
     return this.workService.getWorkList(dto);
+  }
+
+  @Get(':id')
+  getWork(@Param('id', ParseIntPipe) id: number): Promise<Work> {
+    return this.workService.getWork(id);
   }
 
   @Post('create')

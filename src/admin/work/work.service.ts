@@ -1,8 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { WorksList } from './dto/list-work.dto';
 import { Work } from '@prisma/client';
-import { VIEW_PERMISSION, PUBLICATION_STATUS } from 'src/util/enum';
 import { CreateWorkDto } from './dto/create-work';
 import { uploadImagePath } from './interfaces/work.interface';
 
@@ -48,25 +47,15 @@ export class WorkService {
     };
   }
 
-  async getWork(viewParmission: VIEW_PERMISSION, id: number): Promise<Work> {
-    const where = {
-      id,
-      permission: {
-        lte: viewParmission,
-      },
-      publication: {
-        in: [PUBLICATION_STATUS.PUBLIC],
-      },
-    };
-    const data = await this.prisma.work.findMany({
-      where,
+  async getWork(id: number): Promise<Work> {
+    const data = await this.prisma.work.findUnique({
+      where: { id: id },
     });
 
-    if (data.length === 0) {
-      throw new NotFoundException('Work not found');
-    }
+    if (!data)
+      throw new ForbiddenException('該当データが見つかりませんでした。');
 
-    return data[0];
+    return data;
   }
 
   async uploadWorkImage(files: {
