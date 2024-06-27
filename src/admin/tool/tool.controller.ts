@@ -23,9 +23,9 @@ import { UpdateToolsDto } from './dto/update-tools.dto';
 export class ToolController {
   constructor(private readonly toolService: ToolService) {}
 
-  @Get('list')
-  getToolList(): Promise<Pick<Tool, 'id' | 'toolName' | 'order'>[]> {
-    return this.toolService.getTools();
+  @Get('')
+  getTool(): Promise<Pick<Tool, 'id' | 'toolName' | 'order'>[]> {
+    return this.toolService.getAllTools();
   }
 
   @Post('create')

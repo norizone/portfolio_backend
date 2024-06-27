@@ -8,7 +8,7 @@ import { UpdateToolsDto } from './dto/update-tools.dto';
 export class ToolService {
   constructor(private prisma: PrismaService) {}
 
-  async getTools(): Promise<Pick<Tool, 'id' | 'toolName' | 'order'>[]> {
+  async getAllTools(): Promise<Pick<Tool, 'id' | 'toolName' | 'order'>[]> {
     return this.prisma.tool.findMany({
       orderBy: {
         order: 'asc',
