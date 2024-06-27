@@ -36,7 +36,7 @@ export class UserService {
     }
   }
 
-  async getUsers(): Promise<Pick<User, 'id' | 'email' | 'permission'>[]> {
+  async getAllUsers(): Promise<Pick<User, 'id' | 'email' | 'permission'>[]> {
     return this.prisma.user.findMany({
       orderBy: {
         id: 'asc',
