@@ -31,9 +31,9 @@ export class WorkController {
     return this.workService.getWorkList(dto);
   }
 
-  @Get(':id')
-  getWork(@Param('id', ParseIntPipe) id: number): Promise<Work> {
-    return this.workService.getWork(id);
+  @Get('detail/:id')
+  getWorkDetail(@Param('id', ParseIntPipe) id: number): Promise<Work> {
+    return this.workService.getWorkDetail(id);
   }
 
   @Post('create')

@@ -47,7 +47,7 @@ export class WorkService {
     };
   }
 
-  async getWork(id: number): Promise<Work> {
+  async getWorkDetail(id: number): Promise<Work> {
     const data = await this.prisma.work.findUnique({
       where: { id: id },
     });
