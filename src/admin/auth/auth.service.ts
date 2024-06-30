@@ -1,5 +1,5 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Admin, Prisma } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -69,6 +69,18 @@ export class AuthService {
     });
     return {
       accessToken: token,
+    };
+  }
+
+  async getUser(userId: number): Promise<Pick<Admin, 'id' | 'email'>> {
+    const user = await this.prisma.admin.findUnique({
+      where: { id: userId },
+      select: { email: true, id: true },
+    });
+
+    return {
+      id: user?.id,
+      email: user?.email,
     };
   }
 }

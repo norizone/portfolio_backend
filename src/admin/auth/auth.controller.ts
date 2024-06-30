@@ -7,11 +7,14 @@ import {
   Res,
   Req,
   Get,
+  UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { Csrf, Msg } from './interfaces/auth.interface';
+import { AuthGuard } from '@nestjs/passport';
+import { Admin } from '@prisma/client';
 
 @Controller('admin/auth')
 export class AuthController {
@@ -57,5 +60,16 @@ export class AuthController {
     return {
       message: 'ok',
     };
+  }
+
+  @Get('/')
+  @UseGuards(AuthGuard('jwtAdmin'))
+  async getProfileEmail(
+    @Req() req: Request,
+  ): Promise<Pick<Admin, 'id' | 'email'>> {
+    // JWT トークンのペイロードからユーザーIDを取得
+    const userId = req.user.id;
+    const userData = await this.authService.getUser(userId);
+    return userData;
   }
 }
