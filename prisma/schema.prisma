@@ -35,7 +35,7 @@ model Tool {
   order     Int      @unique @default(autoincrement())
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
-  toolName  String
+  toolName  String   @unique
   works     Work[]   @relation("WorkTools")
 }
 

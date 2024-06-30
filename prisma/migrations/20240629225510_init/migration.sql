@@ -70,6 +70,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "Tool_order_key" ON "Tool"("order");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Tool_toolName_key" ON "Tool"("toolName");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Work_order_key" ON "Work"("order");
 
 -- CreateIndex
