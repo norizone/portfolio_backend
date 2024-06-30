@@ -1,9 +1,23 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { Tool } from '@prisma/client';
+import { Prisma, Tool } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateToolDto } from './dto/update-tool.dto';
 import { CreateToolDto } from './dto/create-tool.dto';
 import { UpdateToolsDto } from './dto/update-tools.dto';
+
+const uniqueErrorMessage = ({
+  error,
+  toolName = 'このツール名',
+}: {
+  error: unknown;
+  toolName?: string;
+}) => {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code === 'P2002') {
+      throw new ForbiddenException(`${toolName}は既に使用されています。`);
+    }
+  }
+};
 @Injectable()
 export class ToolService {
   constructor(private prisma: PrismaService) {}
@@ -22,10 +36,16 @@ export class ToolService {
   }
 
   async createTool(dto: CreateToolDto): Promise<Tool> {
-    const tool = await this.prisma.tool.create({
-      data: { ...dto },
-    });
-    return tool;
+    try {
+      const tool = await this.prisma.tool.create({
+        data: { ...dto },
+      });
+      return tool;
+    } catch (error) {
+      console.log(error);
+      uniqueErrorMessage({ error, toolName: dto.toolName });
+      throw error;
+    }
   }
 
   async deleatTooById(toolId: number): Promise<void> {
@@ -63,17 +83,23 @@ export class ToolService {
 
   async updateTools(dto: UpdateToolsDto): Promise<Tool[]> {
     const { tools } = dto;
-    const updateTools = tools.map((tool) => {
-      return this.prisma.tool.update({
-        where: {
-          id: tool.id,
-        },
-        data: {
-          toolName: tool.toolName,
-        },
+    try {
+      const updateTools = tools.map((tool) => {
+        return this.prisma.tool.update({
+          where: {
+            id: tool.id,
+          },
+          data: {
+            toolName: tool.toolName,
+          },
+        });
       });
-    });
-    const updatedTasks = await Promise.all(updateTools);
-    return updatedTasks;
+      const updatedTasks = await Promise.all(updateTools);
+      return updatedTasks;
+    } catch (error) {
+      console.log(error);
+      uniqueErrorMessage({ error });
+      throw error;
+    }
   }
 }
