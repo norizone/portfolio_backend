@@ -6,6 +6,20 @@ import { Msg } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
+const uniqueErrorMessage = ({
+  error,
+  userName = 'このメールアドレス',
+}: {
+  error: unknown;
+  userName?: string;
+}) => {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code === 'P2002') {
+      throw new ForbiddenException(`${userName}は既に使用されています。`);
+    }
+  }
+};
+
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
@@ -25,19 +39,13 @@ export class UserService {
         message: 'ok',
       };
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new ForbiddenException(
-            'このメールアドレスはすでに使用されています。',
-          );
-        }
-      }
+      uniqueErrorMessage({ error });
       throw error;
     }
   }
 
   async getAllUsers(): Promise<Pick<User, 'id' | 'email' | 'permission'>[]> {
-    return this.prisma.user.findMany({
+    const users = await this.prisma.user.findMany({
       orderBy: {
         id: 'asc',
       },
@@ -47,6 +55,7 @@ export class UserService {
         permission: true,
       },
     });
+    return users.length > 0 ? users : [];
   }
 
   async deleteUser(userId: number): Promise<void> {
@@ -73,15 +82,20 @@ export class UserService {
       },
     });
     if (!user) throw new ForbiddenException('ユーザーが見つかりませんでした。');
-    const updateUser = this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        ...dto,
-      },
-    });
-    delete (await updateUser).hashedPassword;
-    return updateUser;
+    try {
+      const updateUser = this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          ...dto,
+        },
+      });
+      delete (await updateUser).hashedPassword;
+      return updateUser;
+    } catch (error) {
+      uniqueErrorMessage({ error });
+      throw error;
+    }
   }
 }
