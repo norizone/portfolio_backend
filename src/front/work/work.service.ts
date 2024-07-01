@@ -3,7 +3,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { WorksList } from './dto/list-work.dto';
 import { Work } from '@prisma/client';
 import { VIEW_PERMISSION, PUBLICATION_STATUS } from 'src/util/enum';
-import { CreateWorkDto } from './dto/create-work';
 
 @Injectable()
 export class WorkService {
@@ -62,9 +61,11 @@ export class WorkService {
     };
   }
 
-  async getWork(viewParmission: VIEW_PERMISSION, id: number): Promise<Work> {
-    const where = {
-      id,
+  async getWorkDetail(
+    viewParmission: VIEW_PERMISSION,
+    id: number,
+  ): Promise<{ item: Work; nextConstents: Pick<Work, 'id' | 'titleEn'> }> {
+    const defaultWhere = {
       permission: {
         lte: viewParmission,
       },
@@ -72,37 +73,37 @@ export class WorkService {
         in: [PUBLICATION_STATUS.PUBLIC],
       },
     };
-    const data = await this.prisma.work.findMany({
-      where,
-    });
 
-    if (data.length === 0) {
-      throw new NotFoundException('Work not found');
-    }
-
-    return data[0];
-  }
-
-  async createWork(dto: CreateWorkDto): Promise<Work> {
-    const { useTools, ...rest } = dto;
-    // ToolDtoをToolCreateWithoutWorkInputに変換
-    const useToolsInput = useTools.map((tool) => ({
-      id: tool.id,
-    }));
-
-    const work = await this.prisma.work.create({
-      data: {
-        ...rest,
-        useTools: {
-          connect: useToolsInput,
-        },
+    const currentWork = await this.prisma.work.findFirst({
+      where: {
+        id,
+        ...defaultWhere,
       },
     });
 
-    return work;
+    if (!currentWork) {
+      throw new NotFoundException('Work not found');
+    }
+
+    const nextWork = await this.prisma.work.findFirst({
+      where: {
+        order: {
+          gt: currentWork.order,
+        },
+        ...defaultWhere,
+      },
+      orderBy: {
+        order: 'asc',
+      },
+      select: {
+        titleEn: true,
+        id: true,
+      },
+    });
+
+    return {
+      item: currentWork,
+      nextConstents: nextWork,
+    };
   }
-
-  async editWork() {}
-
-  async deleteWork() {}
 }
