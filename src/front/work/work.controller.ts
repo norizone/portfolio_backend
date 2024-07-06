@@ -16,7 +16,7 @@ import { VIEW_PERMISSION } from 'src/util/enum';
 import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard';
 
 @UseGuards(OptionalAuthGuard)
-@Controller('work')
+@Controller('front/work')
 export class WorkController {
   constructor(private readonly workService: WorkService) {}
   @Post('/list')

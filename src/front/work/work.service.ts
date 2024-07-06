@@ -19,14 +19,14 @@ export class WorkService {
     const where = {
       permission: {
         lte: viewParmission,
-        publication: {
-          in: [PUBLICATION_STATUS.PUBLIC],
-        },
+      },
+      publication: {
+        in: [PUBLICATION_STATUS.PUBLIC],
       },
     };
 
-    const { page = 1, limit = 5 } = dto;
-    const skip = (page - 1) * limit;
+    const { page = 1, pageSize = 5 } = dto;
+    const skip = (page - 1) * pageSize;
     const totalCount = await this.prisma.work.count({
       where,
     });
@@ -38,10 +38,10 @@ export class WorkService {
         totalCount: 0,
       };
 
-    const totalPages = Math.ceil(totalCount / limit);
+    const totalPages = Math.ceil(totalCount / pageSize);
     const data = await this.prisma.work.findMany({
       skip,
-      take: limit,
+      take: pageSize,
       orderBy: {
         order: 'asc',
       },
