@@ -16,11 +16,15 @@ import { CreateWorkDto } from './dto/create-work';
 import { AuthGuard } from '@nestjs/passport';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { uploadImagePath } from './interfaces/work.interface';
+import { S3Service } from '../s3/s3.service';
 
 @UseGuards(AuthGuard('jwtAdmin'))
 @Controller('admin/work')
 export class WorkController {
-  constructor(private readonly workService: WorkService) {}
+  constructor(
+    private readonly workService: WorkService,
+    private readonly s3Service: S3Service,
+  ) {}
 
   @Post('list')
   getWorks(@Body() dto: WorksList): Promise<{
