@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { WorksList } from './dto/list-work.dto';
 import { Work } from '@prisma/client';
@@ -57,7 +57,7 @@ export class WorkService {
     });
 
     if (!data)
-      throw new ForbiddenException('該当データが見つかりませんでした。');
+      throw new NotFoundException('該当データが見つかりませんでした。');
 
     return data;
   }

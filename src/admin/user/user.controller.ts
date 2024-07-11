@@ -23,7 +23,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('list')
+  @Get('/')
   getAllUsers(): Promise<Pick<User, 'id' | 'email' | 'permission'>[]> {
     return this.userService.getAllUsers();
   }
