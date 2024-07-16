@@ -1,23 +1,20 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { WorksList } from './dto/list-work.dto';
 import { Work } from '@prisma/client';
 import { CreateWorkDto } from './dto/create-work';
-import { uploadImagePath } from './interfaces/work.interface';
-import { S3Service } from '../s3/s3.service';
+import { UpdateWorkDto } from './dto/update-work';
+import { DetailWorkRes, WorkListRes } from './types/work.type';
 
 @Injectable()
 export class WorkService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly s3Service: S3Service,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async getWorkList(dto: WorksList): Promise<{
-    items: Pick<Work, 'id' | 'title' | 'order' | 'publication'>[];
-    totalPages: number;
-    totalCount: number;
-  }> {
+  async getWorkList(dto: WorksList): Promise<WorkListRes> {
     const { page = 1, pageSize = 5 } = dto;
     const skip = Math.max((page - 1) * pageSize, 0);
     const totalCount = await this.prisma.work.count();
@@ -51,74 +48,40 @@ export class WorkService {
     };
   }
 
-  async getWorkDetail(id: number): Promise<Work> {
+  async getWorkDetail(id: number): Promise<DetailWorkRes> {
     const data = await this.prisma.work.findUnique({
-      where: { id: id },
+      where: { id },
+      select: {
+        id: true,
+        order: true,
+        permission: true,
+        publication: true,
+        title: true,
+        titleEn: true,
+        archiveImg: true,
+        comment: true,
+        url: true,
+        gitUrl: true,
+        role: true,
+        singleImgMain: true,
+        singleImgSub: true,
+        singleImgSub2: true,
+        useTools: true,
+      },
     });
 
     if (!data)
       throw new NotFoundException('該当データが見つかりませんでした。');
 
-    return data;
-  }
+    const useToolIds = data.useTools.map((tool) => ({
+      id: tool.id,
+    }));
 
-  async uploadWorkImage(files: {
-    archiveImg?: Express.Multer.File[];
-    singleImgMain?: Express.Multer.File[];
-    singleImgSub?: Express.Multer.File[];
-    singleImgSub2?: Express.Multer.File[];
-  }): Promise<uploadImagePath> {
-    const { archiveImg, singleImgMain, singleImgSub, singleImgSub2 } = files;
-    const archiveImgPromise = archiveImg
-      ? this.s3Service.uploadFile(archiveImg[0])
-      : null;
-    const singleImgMainPromise = singleImgMain
-      ? this.s3Service.uploadFile(singleImgMain[0])
-      : null;
-    const singleImgSubPromise = singleImgSub
-      ? this.s3Service.uploadFile(singleImgSub[0])
-      : null;
-    const singleImgSub2Promise = singleImgSub2
-      ? this.s3Service.uploadFile(singleImgSub2[0])
-      : null;
-    const promises = [
-      archiveImgPromise,
-      singleImgMainPromise,
-      singleImgSubPromise,
-      singleImgSub2Promise,
-    ];
-    const [
-      archiveImgPath,
-      singleImgMainPath,
-      singleImgSubPath,
-      singleImgSub2Path,
-    ] = await Promise.all(promises);
     return {
-      archiveImg: archiveImgPath,
-      singleImgMain: singleImgMainPath,
-      singleImgSub: singleImgSubPath,
-      singleImgSub2: singleImgSub2Path,
+      ...data,
+      useTools: useToolIds,
     };
   }
-
-  // async uploadWorkImage(files: {
-  //   archiveImg?: Express.Multer.File[];
-  //   singleImgMain?: Express.Multer.File[];
-  //   singleImgSub?: Express.Multer.File[];
-  //   singleImgSub2?: Express.Multer.File[];
-  // }): Promise<uploadImagePath> {
-  //   const { archiveImg, singleImgMain, singleImgSub, singleImgSub2 } = files;
-  //   const archiveImgPath = archiveImg ? archiveImg[0].path : null;
-  //   const singleImgMainPath = singleImgMain ? singleImgMain[0].path : null;
-  //   const singleImgSubPath = singleImgSub ? singleImgSub[0].path : null;
-  //   const singleImgSub2Path = singleImgSub2 ? singleImgSub2[0].path : null;
-  //   return {
-  //     archiveImg: archiveImgPath,
-  //     singleImgMain: singleImgMainPath,
-  //     singleImgSub: singleImgSubPath,
-  //     singleImgSub2: singleImgSub2Path,
-  //   };
-  // }
 
   async createWork(dto: CreateWorkDto): Promise<Work> {
     const { useTools, ...rest } = dto;
@@ -134,7 +97,39 @@ export class WorkService {
     return work;
   }
 
-  async editWork() {}
+  async editWork(id: number, dto: UpdateWorkDto): Promise<Work> {
+    const { useTools, ...rest } = dto;
+    const work = await this.prisma.work.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!work) throw new ForbiddenException('該当実績が見つかりませんでした。');
+    return this.prisma.work.update({
+      where: {
+        id,
+      },
+      data: {
+        ...rest,
+        useTools: {
+          set: [],
+          connect: useTools,
+        },
+      },
+    });
+  }
 
-  async deleteWork() {}
+  async deleatWorkId(id: number): Promise<void> {
+    const work = await this.prisma.work.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!work) throw new ForbiddenException('該当実績が見つかりませんでした。');
+    await this.prisma.work.delete({
+      where: {
+        id,
+      },
+    });
+  }
 }

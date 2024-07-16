@@ -14,6 +14,7 @@ import { Request } from 'express';
 import { WorksList } from './dto/list-work.dto';
 import { VIEW_PERMISSION } from 'src/util/enum';
 import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard';
+import { DetailWorkRes } from './types/work.type';
 
 @UseGuards(OptionalAuthGuard)
 @Controller('front/work')
@@ -38,7 +39,7 @@ export class WorkController {
   getWorkDetail(
     @Req() req: Request,
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<{ item: Work; nextConstents: Pick<Work, 'id' | 'titleEn'> }> {
+  ): Promise<DetailWorkRes> {
     const viewParmission = req.user
       ? req.user.permission
       : VIEW_PERMISSION.GUEST;

@@ -1,11 +1,15 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
-  UploadedFiles,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -14,9 +18,10 @@ import { Work } from '@prisma/client';
 import { WorksList } from './dto/list-work.dto';
 import { CreateWorkDto } from './dto/create-work';
 import { AuthGuard } from '@nestjs/passport';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { uploadImagePath } from './interfaces/work.interface';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from '../s3/s3.service';
+import { UpdateWorkDto } from './dto/update-work';
+import { DetailWorkRes, WorkListRes } from './types/work.type';
 
 @UseGuards(AuthGuard('jwtAdmin'))
 @Controller('admin/work')
@@ -27,17 +32,19 @@ export class WorkController {
   ) {}
 
   @Post('list')
-  getWorks(@Body() dto: WorksList): Promise<{
-    items: Pick<Work, 'id' | 'title' | 'order' | 'publication'>[];
-    totalPages: number;
-    totalCount: number;
-  }> {
+  getWorks(@Body() dto: WorksList): Promise<WorkListRes> {
     return this.workService.getWorkList(dto);
   }
 
   @Get('detail/:id')
-  getWorkDetail(@Param('id', ParseIntPipe) id: number): Promise<Work> {
+  getWorkDetail(@Param('id', ParseIntPipe) id: number): Promise<DetailWorkRes> {
     return this.workService.getWorkDetail(id);
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Delete('delete/:id')
+  deleteTool(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return this.workService.deleatWorkId(id);
   }
 
   @Post('create')
@@ -45,24 +52,19 @@ export class WorkController {
     return this.workService.createWork(dto);
   }
 
-  @Post('upload_images')
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'archiveImg', maxCount: 1 },
-      { name: 'singleImgMain', maxCount: 1 },
-      { name: 'singleImgSub', maxCount: 1 },
-      { name: 'singleImgSub2', maxCount: 1 },
-    ]),
-  )
-  uploadImage(
-    @UploadedFiles()
-    files: {
-      archiveImg?: Express.Multer.File[];
-      singleImgMain?: Express.Multer.File[];
-      singleImgSub?: Express.Multer.File[];
-      singleImgSub2?: Express.Multer.File[];
-    },
-  ): Promise<uploadImagePath> {
-    return this.workService.uploadWorkImage(files);
+  @Post('upload_image')
+  @UseInterceptors(FileInterceptor('uploadImg'))
+  async uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<string> {
+    return this.s3Service.uploadFile(file);
+  }
+
+  @Patch('edit/:id')
+  updataWork(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateWorkDto,
+  ): Promise<Work> {
+    return this.workService.editWork(id, dto);
   }
 }

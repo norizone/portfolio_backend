@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { WorksList } from './dto/list-work.dto';
 import { Work } from '@prisma/client';
 import { VIEW_PERMISSION, PUBLICATION_STATUS } from 'src/util/enum';
+import { DetailWorkRes } from './types/work.type';
 
 @Injectable()
 export class WorkService {
@@ -50,7 +51,11 @@ export class WorkService {
         id: true,
         titleEn: true,
         archiveImg: true,
-        useTools: true,
+        useTools: {
+          select: {
+            toolName: true,
+          },
+        },
       },
     });
 
@@ -64,7 +69,7 @@ export class WorkService {
   async getWorkDetail(
     viewParmission: VIEW_PERMISSION,
     id: number,
-  ): Promise<{ item: Work; nextConstents: Pick<Work, 'id' | 'titleEn'> }> {
+  ): Promise<DetailWorkRes> {
     const defaultWhere = {
       permission: {
         lte: viewParmission,
@@ -78,6 +83,25 @@ export class WorkService {
       where: {
         id,
         ...defaultWhere,
+      },
+      select: {
+        title: true,
+        id: true,
+        titleEn: true,
+        archiveImg: true,
+        comment: true,
+        url: true,
+        gitUrl: true,
+        singleImgMain: true,
+        singleImgSub: true,
+        singleImgSub2: true,
+        role: true,
+        order: true,
+        useTools: {
+          select: {
+            toolName: true,
+          },
+        },
       },
     });
 
@@ -103,7 +127,7 @@ export class WorkService {
 
     return {
       item: currentWork,
-      nextConstents: nextWork,
+      nextContents: nextWork,
     };
   }
 }

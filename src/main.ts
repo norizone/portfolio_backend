@@ -14,7 +14,7 @@ async function bootstrap() {
   app.enableCors({
     //CORS設定
     credentials: true, //cookie受け取るよう
-    origin: ['http://localhost:3000'],
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
   });
   app.use(cookieParser());
   await app.listen(process.env.PORT || 3005);
