@@ -43,8 +43,9 @@ export class CreateWorkDto {
   @IsNotEmpty()
   role: string;
 
+  @IsOptional()
   @IsString()
-  comment?: string;
+  comment?: string | null;
 
   @IsOptional()
   @IsString()
