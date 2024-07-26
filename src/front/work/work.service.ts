@@ -11,7 +11,7 @@ export class WorkService {
 
   async getWorkList(
     dto: WorksList,
-    viewParmission: VIEW_PERMISSION,
+    viewPermission: VIEW_PERMISSION,
   ): Promise<{
     items: Pick<Work, 'id' | 'titleEn' | 'archiveImg'>[];
     totalPages: number;
@@ -19,7 +19,7 @@ export class WorkService {
   }> {
     const where = {
       permission: {
-        lte: viewParmission,
+        lte: viewPermission,
       },
       publication: {
         in: [PUBLICATION_STATUS.PUBLIC],
@@ -67,12 +67,12 @@ export class WorkService {
   }
 
   async getWorkDetail(
-    viewParmission: VIEW_PERMISSION,
+    viewPermission: VIEW_PERMISSION,
     id: number,
   ): Promise<DetailWorkRes> {
     const defaultWhere = {
       permission: {
-        lte: viewParmission,
+        lte: viewPermission,
       },
       publication: {
         in: [PUBLICATION_STATUS.PUBLIC],

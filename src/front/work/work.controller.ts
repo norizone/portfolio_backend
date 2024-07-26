@@ -29,10 +29,10 @@ export class WorkController {
     totalPages: number;
     totalCount: number;
   }> {
-    const viewParmission = req.user
+    const viewPermission = req.user
       ? req.user.permission
       : VIEW_PERMISSION.GUEST;
-    return this.workService.getWorkList(dto, viewParmission);
+    return this.workService.getWorkList(dto, viewPermission);
   }
 
   @Get('detail/:id')
@@ -40,9 +40,9 @@ export class WorkController {
     @Req() req: Request,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<DetailWorkRes> {
-    const viewParmission = req.user
+    const viewPermission = req.user
       ? req.user.permission
       : VIEW_PERMISSION.GUEST;
-    return this.workService.getWorkDetail(viewParmission, id);
+    return this.workService.getWorkDetail(viewPermission, id);
   }
 }
