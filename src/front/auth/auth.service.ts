@@ -40,11 +40,20 @@ export class AuthService {
     };
     const secret = this.config.get('JTW_SECRET');
     const token = await this.jwt.signAsync(payload, {
-      expiresIn: '5m', // アクセストークン有効期限
+      expiresIn: '120m', // アクセストークン有効期限
       secret: secret,
     });
     return {
       accessToken: token,
+    };
+  }
+
+  async getUser(userId: number): Promise<{ userPermission: number }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    return {
+      userPermission: user.permission,
     };
   }
 }

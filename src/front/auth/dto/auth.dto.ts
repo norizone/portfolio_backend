@@ -4,7 +4,6 @@ import {
   // IsInt,
   IsNotEmpty,
   IsString,
-  MinLength,
 } from 'class-validator';
 export class AuthDto {
   @IsEmail()
@@ -13,11 +12,5 @@ export class AuthDto {
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(5)
   password: string;
-
-  // // @Transform(({ value }) => parseInt(value))
-  // @IsInt()
-  // @IsNotEmpty()
-  // permission: number;
 }

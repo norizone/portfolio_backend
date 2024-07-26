@@ -7,11 +7,14 @@ import {
   Res,
   Req,
   Get,
+  UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { Csrf, Msg } from './interfaces/auth.interface';
+import { OptionalAuthGuard } from './guards/optional-auth.guard';
+import { VIEW_PERMISSION } from '@/util/enum';
 
 @Controller('front/auth')
 export class AuthController {
@@ -52,5 +55,16 @@ export class AuthController {
     return {
       message: 'ok',
     };
+  }
+
+  @UseGuards(OptionalAuthGuard)
+  @Get('/')
+  async getProfileEmail(@Req() req: Request): Promise<{ userId: number }> {
+    // JWT トークンのペイロードからユーザーIDを取得
+    const viewPermission = req.user
+      ? req.user.permission
+      : VIEW_PERMISSION.GUEST;
+    const userId = viewPermission;
+    return { userId };
   }
 }
