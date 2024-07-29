@@ -21,7 +21,7 @@ export class jwtAdminStrategy extends PassportStrategy(Strategy, 'jwtAdmin') {
         },
       ]),
       ignoreExpiration: false, //有効期限が切れてても判定するか
-      secretOrKey: config.get('JTW_SECRET'),
+      secretOrKey: config.get('JTW_SECRET_ADMIN'),
     });
   }
 

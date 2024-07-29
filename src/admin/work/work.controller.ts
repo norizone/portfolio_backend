@@ -44,7 +44,7 @@ export class WorkController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete('delete/:id')
   deleteTool(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.workService.deleatWorkId(id);
+    return this.workService.deleteWorkId(id);
   }
 
   @Post('create')

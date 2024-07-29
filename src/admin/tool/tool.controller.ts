@@ -49,6 +49,6 @@ export class ToolController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete('delete/:id')
   deleteTool(@Param('id', ParseIntPipe) toolId: number): Promise<void> {
-    return this.toolService.deleatTooById(toolId);
+    return this.toolService.deleteTooById(toolId);
   }
 }

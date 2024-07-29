@@ -119,7 +119,7 @@ export class WorkService {
     });
   }
 
-  async deleatWorkId(id: number): Promise<void> {
+  async deleteWorkId(id: number): Promise<void> {
     const work = await this.prisma.work.findUnique({
       where: {
         id,

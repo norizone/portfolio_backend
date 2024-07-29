@@ -48,7 +48,7 @@ export class ToolService {
     }
   }
 
-  async deleatTooById(toolId: number): Promise<void> {
+  async deleteTooById(toolId: number): Promise<void> {
     const tool = await this.prisma.tool.findUnique({
       where: {
         id: toolId,
