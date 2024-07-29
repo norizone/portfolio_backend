@@ -16,7 +16,7 @@ export class ToolDto {
   id: number;
 }
 
-export class CreateWorkDto {
+export class CreateEditWorkDto {
   @Transform(({ value }) => parseInt(value, 10))
   @IsInt()
   @IsNotEmpty()

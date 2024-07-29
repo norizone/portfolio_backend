@@ -6,8 +6,7 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { WorksList } from './dto/list-work.dto';
 import { Work } from '@prisma/client';
-import { CreateWorkDto } from './dto/create-work';
-import { UpdateWorkDto } from './dto/update-work';
+import { CreateEditWorkDto } from './dto/create-work';
 import { DetailWorkRes, WorkListRes } from './types/work.type';
 
 @Injectable()
@@ -83,7 +82,7 @@ export class WorkService {
     };
   }
 
-  async createWork(dto: CreateWorkDto): Promise<Work> {
+  async createWork(dto: CreateEditWorkDto): Promise<Work> {
     const { useTools, ...rest } = dto;
     const work = await this.prisma.work.create({
       data: {
@@ -97,7 +96,7 @@ export class WorkService {
     return work;
   }
 
-  async editWork(id: number, dto: UpdateWorkDto): Promise<Work> {
+  async editWork(id: number, dto: CreateEditWorkDto): Promise<Work> {
     const { useTools, ...rest } = dto;
     const work = await this.prisma.work.findUnique({
       where: {

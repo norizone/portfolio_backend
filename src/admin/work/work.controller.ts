@@ -16,11 +16,10 @@ import {
 import { WorkService } from './work.service';
 import { Work } from '@prisma/client';
 import { WorksList } from './dto/list-work.dto';
-import { CreateWorkDto } from './dto/create-work';
+import { CreateEditWorkDto } from './dto/create-work';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from '../s3/s3.service';
-import { UpdateWorkDto } from './dto/update-work';
 import { DetailWorkRes, WorkListRes } from './types/work.type';
 
 @UseGuards(AuthGuard('jwtAdmin'))
@@ -48,7 +47,7 @@ export class WorkController {
   }
 
   @Post('create')
-  createWork(@Body() dto: CreateWorkDto): Promise<Work> {
+  createWork(@Body() dto: CreateEditWorkDto): Promise<Work> {
     return this.workService.createWork(dto);
   }
 
@@ -63,7 +62,7 @@ export class WorkController {
   @Patch('edit/:id')
   updataWork(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateWorkDto,
+    @Body() dto: CreateEditWorkDto,
   ): Promise<Work> {
     return this.workService.editWork(id, dto);
   }
