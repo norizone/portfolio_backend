@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v7 as uuidv7 } from 'uuid';
-import { extname } from 'path';
+import { basename, extname } from 'path';
 import * as sharp from 'sharp';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
@@ -32,14 +32,17 @@ export class S3Service {
       const metadata = await image.metadata();
       const width = metadata.width;
       const height = metadata.height;
+      const webpBuffer = await image.webp({ quality: 80 }).toBuffer();
+      const fileNameWithoutExt = basename(file.originalname, fileExtension);
 
+      console.log(fileExtension);
       // ファイルキーに幅情報を含める
-      const key = `${uuidv7()}_width:${width}_height:${height}_${fileExtension}`;
+      const key = `${uuidv7()}_width:${width}_height:${height}_${fileNameWithoutExt}.webp`;
 
       const params = {
         Bucket: this.bucketName,
         Key: key,
-        Body: file.buffer,
+        Body: webpBuffer,
         ContentType: file.mimetype,
       };
 

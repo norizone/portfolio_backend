@@ -60,7 +60,7 @@ export class WorkController {
   }
 
   @Patch('edit/:id')
-  updataWork(
+  editWork(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: CreateEditWorkDto,
   ): Promise<Work> {
