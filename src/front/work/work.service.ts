@@ -91,6 +91,7 @@ export class WorkService {
         archiveImg: true,
         comment: true,
         url: true,
+        isLinkToUrl: true,
         gitUrl: true,
         singleImgMain: true,
         singleImgSub: true,

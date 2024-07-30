@@ -52,6 +52,10 @@ export class CreateEditWorkDto {
   url?: string | null;
 
   @IsOptional()
+  @IsInt()
+  isLinkToUrl?: number | null;
+
+  @IsOptional()
   @IsString()
   gitUrl?: string | null;
 

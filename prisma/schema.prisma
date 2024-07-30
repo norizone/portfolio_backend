@@ -52,6 +52,7 @@ model Work {
   useTools      Tool[]   @relation("WorkTools")
   comment       String?
   url           String?
+  isLinkToUrl   Int?     @default(0)
   gitUrl        String?
   role          String
   singleImgMain String
