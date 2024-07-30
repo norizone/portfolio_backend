@@ -56,6 +56,6 @@ model Work {
   gitUrl        String?
   role          String
   singleImgMain String
-  singleImgSub  String
+  singleImgSub  String?
   singleImgSub2 String?
 }

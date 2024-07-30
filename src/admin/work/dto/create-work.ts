@@ -59,8 +59,8 @@ export class CreateEditWorkDto {
   @IsString()
   gitUrl?: string | null;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   singleImgMain: string;
 
   @IsString()
