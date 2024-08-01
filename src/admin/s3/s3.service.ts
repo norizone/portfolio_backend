@@ -3,7 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { v7 as uuidv7 } from 'uuid';
 import { basename, extname } from 'path';
 import * as sharp from 'sharp';
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 
 @Injectable()
 export class S3Service {
@@ -25,7 +29,6 @@ export class S3Service {
 
   async uploadFile(file: Express.Multer.File): Promise<string> {
     const fileExtension = extname(file.originalname);
-
     try {
       // sharpを使用して画像の幅を取得
       const image = sharp(file.buffer);
@@ -35,7 +38,6 @@ export class S3Service {
       const webpBuffer = await image.webp({ quality: 80 }).toBuffer();
       const fileNameWithoutExt = basename(file.originalname, fileExtension);
 
-      console.log(fileExtension);
       // ファイルキーに幅情報を含める
       const key = `${uuidv7()}_width:${width}_height:${height}_${fileNameWithoutExt}.webp`;
 
@@ -53,6 +55,39 @@ export class S3Service {
     } catch (error) {
       console.error('Error processing image:', error);
       throw new Error('Error processing image');
+    }
+  }
+
+  async deleteFile(fileName: string): Promise<void> {
+    console.log(fileName);
+    try {
+      const params = {
+        Bucket: this.bucketName,
+        Key: fileName,
+      };
+      const command = new DeleteObjectCommand(params);
+      await this.s3.send(command);
+      console.log(`File deleted successfully: ${fileName}`);
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      throw new Error('Error deleting file');
+    }
+  }
+
+  async editFile(
+    file: Express.Multer.File,
+    oldFileName: string,
+  ): Promise<string> {
+    try {
+      const [newFileUrl] = await Promise.all([
+        this.uploadFile(file),
+        this.deleteFile(oldFileName),
+      ]);
+
+      return newFileUrl;
+    } catch (error) {
+      console.error('Error editing file:', error);
+      throw new Error('Error editing file');
     }
   }
 }

@@ -63,8 +63,8 @@ export class CreateEditWorkDto {
   @IsString()
   singleImgMain: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   singleImgSub: string;
 
   @IsOptional()

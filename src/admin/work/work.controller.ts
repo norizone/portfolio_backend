@@ -59,6 +59,20 @@ export class WorkController {
     return this.s3Service.uploadFile(file);
   }
 
+  @Post('delete_image')
+  async deleteImage(@Body('fileName') fileName: string): Promise<void> {
+    return this.s3Service.deleteFile(fileName);
+  }
+
+  @Post('edit_image')
+  @UseInterceptors(FileInterceptor('uploadImg'))
+  async editImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('oldFileName') oldFileName: string,
+  ): Promise<string> {
+    return this.s3Service.editFile(file, oldFileName);
+  }
+
   @Patch('edit/:id')
   editWork(
     @Param('id', ParseIntPipe) id: number,
