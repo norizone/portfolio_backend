@@ -15,10 +15,14 @@ import { AuthDto } from './dto/auth.dto';
 import { Csrf, Msg } from './interfaces/auth.interface';
 import { AuthGuard } from '@nestjs/passport';
 import { Admin } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('admin/auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly config: ConfigService,
+  ) {}
 
   @Get('csrf')
   getCsrfToken(@Req() req: Request): Csrf {
@@ -36,7 +40,8 @@ export class AuthController {
     res.cookie('access_token', '', {
       httpOnly: true,
       secure: true,
-      sameSite: 'none',
+      sameSite: this.config.get('COOKIE_SAME_SITE'),
+      domain: this.config.get('COOKIE_DOMAIN'),
       path: '/',
     });
     return {
@@ -54,7 +59,8 @@ export class AuthController {
     res.cookie('access_token', jwt.accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: 'none',
+      sameSite: this.config.get('COOKIE_SAME_SITE'),
+      domain: this.config.get('COOKIE_DOMAIN'),
       path: '/',
     });
     return {
