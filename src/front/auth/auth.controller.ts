@@ -15,10 +15,14 @@ import { AuthDto } from './dto/auth.dto';
 import { Csrf, Msg } from './interfaces/auth.interface';
 import { OptionalAuthGuard } from './guards/optional-auth.guard';
 import { VIEW_PERMISSION } from '@/util/enum';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('front/auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly config: ConfigService,
+  ) {}
 
   @Get('csrf')
   getCsrfToken(@Req() req: Request): Csrf {
@@ -31,7 +35,8 @@ export class AuthController {
     res.cookie('access_token', '', {
       httpOnly: true,
       secure: true,
-      sameSite: 'none',
+      sameSite: this.config.get('COOKIE_SAME_SITE'),
+      domain: this.config.get('COOKIE_DOMAIN'),
       path: '/',
     });
     return {
@@ -49,7 +54,8 @@ export class AuthController {
     res.cookie('access_token', jwt.accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: 'none',
+      sameSite: this.config.get('COOKIE_SAME_SITE'),
+      domain: this.config.get('COOKIE_DOMAIN'),
       path: '/',
     });
     return {
