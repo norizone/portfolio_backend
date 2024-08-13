@@ -113,7 +113,7 @@ export class WorkService {
     const nextWork = await this.prisma.work.findFirst({
       where: {
         order: {
-          gt: currentWork.order,
+          lt: currentWork.order,
         },
         ...defaultWhere,
       },
