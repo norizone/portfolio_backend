@@ -64,7 +64,7 @@ export class AuthService {
     };
     const secret = this.config.get('JTW_SECRET_ADMIN');
     const token = await this.jwt.signAsync(payload, {
-      expiresIn: '1440m', // アクセストークン有効期限
+      expiresIn: '4320m', // アクセストークン有効期限
       secret: secret,
     });
     return {

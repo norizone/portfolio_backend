@@ -44,7 +44,7 @@ export class WorkService {
       skip,
       take: pageSize,
       orderBy: {
-        order: 'asc',
+        order: 'desc',
       },
       where,
       select: {
@@ -118,7 +118,7 @@ export class WorkService {
         ...defaultWhere,
       },
       orderBy: {
-        order: 'asc',
+        order: 'desc',
       },
       select: {
         titleEn: true,

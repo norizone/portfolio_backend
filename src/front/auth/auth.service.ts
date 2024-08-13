@@ -40,7 +40,7 @@ export class AuthService {
     };
     const secret = this.config.get('JTW_SECRET');
     const token = await this.jwt.signAsync(payload, {
-      expiresIn: '120m', // アクセストークン有効期限
+      expiresIn: '1440m', // アクセストークン有効期限
       secret: secret,
     });
     return {
