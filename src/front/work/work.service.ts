@@ -55,6 +55,9 @@ export class WorkService {
           select: {
             toolName: true,
           },
+          orderBy: {
+            order: 'asc',
+          },
         },
       },
     });
@@ -101,6 +104,9 @@ export class WorkService {
         useTools: {
           select: {
             toolName: true,
+          },
+          orderBy: {
+            order: 'asc',
           },
         },
       },
