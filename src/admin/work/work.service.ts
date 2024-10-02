@@ -35,7 +35,7 @@ export class WorkService {
       select: {
         id: true,
         title: true,
-        order: true,
+        permission: true,
         publication: true,
       },
     });

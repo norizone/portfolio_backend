@@ -28,7 +28,10 @@ export type DetailWorkRes = {
 
 // export type EditCreateWorkBody = Omit<DetailWork, 'id'>;
 
-export type WorkList = Pick<Work, 'id' | 'title' | 'order' | 'publication'>;
+export type WorkList = Pick<
+  Work,
+  'id' | 'title' | 'permission' | 'publication'
+>;
 
 export type WorkListRes = {
   items: WorkList[];
