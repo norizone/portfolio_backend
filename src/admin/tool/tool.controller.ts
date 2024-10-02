@@ -17,6 +17,8 @@ import { Tool } from '@prisma/client';
 import { CreateToolDto } from './dto/create-tool.dto';
 import { UpdateToolDto } from './dto/update-tool.dto';
 import { UpdateToolsDto } from './dto/update-tools.dto';
+import { UpdateToolOrderDto } from './dto/update-order.dto';
+import { Msg } from './types/tool.type';
 
 @UseGuards(AuthGuard('jwtAdmin'))
 @Controller('admin/tool')
@@ -31,6 +33,13 @@ export class ToolController {
   @Post('create')
   createTool(@Body() dto: CreateToolDto): Promise<Tool> {
     return this.toolService.createTool(dto);
+  }
+
+  @Patch('edit/order')
+  updateOrderTool(
+    @Body() updateToolOrderDto: UpdateToolOrderDto,
+  ): Promise<Msg> {
+    return this.toolService.reorderTools(updateToolOrderDto);
   }
 
   @Patch('edit')

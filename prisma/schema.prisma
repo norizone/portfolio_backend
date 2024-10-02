@@ -32,7 +32,7 @@ model User {
 
 model Tool {
   id        Int      @id @default(autoincrement())
-  order     Int      @unique @default(autoincrement())
+  order     Int      @default(autoincrement())
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
   toolName  String   @unique
@@ -43,7 +43,7 @@ model Work {
   id            Int      @id @default(autoincrement())
   createdAt     DateTime @default(now())
   updateAt      DateTime @updatedAt
-  order         Int      @unique @default(autoincrement())
+  order         Int      @default(autoincrement())
   permission    Int      @default(3)
   publication   Int      @default(0)
   title         String

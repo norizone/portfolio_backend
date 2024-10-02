@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateToolDto } from './dto/update-tool.dto';
 import { CreateToolDto } from './dto/create-tool.dto';
 import { UpdateToolsDto } from './dto/update-tools.dto';
+import { UpdateToolOrderDto } from './dto/update-order.dto';
 
 const uniqueErrorMessage = ({
   error,
@@ -101,5 +102,58 @@ export class ToolService {
       uniqueErrorMessage({ error });
       throw error;
     }
+  }
+
+  async reorderTools(dto: UpdateToolOrderDto) {
+    const { id, order: newOrder } = dto;
+
+    // 現在の順序を取得
+    const currentTool = await this.prisma.tool.findUnique({
+      where: { id },
+    });
+
+    if (!currentTool) {
+      throw new Error('Tool not found');
+    }
+
+    const currentOrder = currentTool.order;
+
+    if (newOrder < currentOrder) {
+      await this.prisma.tool.updateMany({
+        where: {
+          order: {
+            gte: newOrder,
+            lt: currentOrder,
+          },
+        },
+        data: {
+          order: {
+            increment: 1, // 1つずつorderを上げる
+          },
+        },
+      });
+    } else if (newOrder > currentOrder) {
+      await this.prisma.tool.updateMany({
+        where: {
+          order: {
+            gt: currentOrder,
+            lte: newOrder,
+          },
+        },
+        data: {
+          order: {
+            decrement: 1, // 1つずつorderを下げる
+          },
+        },
+      });
+    }
+
+    // 変更されたツール自体のorderを更新
+    await this.prisma.tool.update({
+      where: { id },
+      data: { order: newOrder },
+    });
+
+    return { message: 'Tools reordered successfully' };
   }
 }
