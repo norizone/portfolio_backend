@@ -8,6 +8,7 @@ import { WorksList } from './dto/list-work.dto';
 import { Work } from '@prisma/client';
 import { CreateEditWorkDto } from './dto/create-work';
 import { DetailWorkRes, WorkListRes } from './types/work.type';
+import { UpdateWorkOrderDto } from './dto/update-order.dto';
 
 @Injectable()
 export class WorkService {
@@ -45,6 +46,21 @@ export class WorkService {
       totalPages,
       totalCount,
     };
+  }
+
+  async getAllWorkList(): Promise<Pick<Work, 'id' | 'title' | 'order'>[]> {
+    return this.prisma.work.findMany({
+      orderBy: {
+        order: 'desc',
+      },
+      select: {
+        id: true,
+        title: true,
+        order: true,
+        permission: true,
+        publication: true,
+      },
+    });
   }
 
   async getWorkDetail(id: number): Promise<DetailWorkRes> {
@@ -131,5 +147,58 @@ export class WorkService {
         id,
       },
     });
+  }
+
+  async reorderWork(dto: UpdateWorkOrderDto) {
+    const { id, order: newOrder } = dto;
+
+    // 現在の順序を取得
+    const currentWork = await this.prisma.work.findUnique({
+      where: { id },
+    });
+
+    if (!currentWork) {
+      throw new Error('work not found');
+    }
+
+    const currentOrder = currentWork.order;
+
+    if (newOrder < currentOrder) {
+      await this.prisma.work.updateMany({
+        where: {
+          order: {
+            gte: newOrder,
+            lt: currentOrder,
+          },
+        },
+        data: {
+          order: {
+            increment: 1, // 1つずつorderを上げる
+          },
+        },
+      });
+    } else if (newOrder > currentOrder) {
+      await this.prisma.work.updateMany({
+        where: {
+          order: {
+            gt: currentOrder,
+            lte: newOrder,
+          },
+        },
+        data: {
+          order: {
+            decrement: 1, // 1つずつorderを下げる
+          },
+        },
+      });
+    }
+
+    // 変更されたツール自体のorderを更新
+    await this.prisma.work.update({
+      where: { id },
+      data: { order: newOrder },
+    });
+
+    return { message: 'work reordered successfully' };
   }
 }

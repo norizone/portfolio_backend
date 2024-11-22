@@ -38,3 +38,7 @@ export type WorkListRes = {
   totalPages: number;
   totalCount: number;
 };
+
+export type Msg = {
+  message: string;
+};

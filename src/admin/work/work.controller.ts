@@ -20,7 +20,8 @@ import { CreateEditWorkDto } from './dto/create-work';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from '../s3/s3.service';
-import { DetailWorkRes, WorkListRes } from './types/work.type';
+import { DetailWorkRes, Msg, WorkListRes } from './types/work.type';
+import { UpdateWorkOrderDto } from './dto/update-order.dto';
 
 @UseGuards(AuthGuard('jwtAdmin'))
 @Controller('admin/work')
@@ -33,6 +34,11 @@ export class WorkController {
   @Post('list')
   getWorks(@Body() dto: WorksList): Promise<WorkListRes> {
     return this.workService.getWorkList(dto);
+  }
+
+  @Get('list_all')
+  getAllWorks(): Promise<Pick<Work, 'id' | 'title' | 'order'>[]> {
+    return this.workService.getAllWorkList();
   }
 
   @Get('detail/:id')
@@ -79,5 +85,12 @@ export class WorkController {
     @Body() dto: CreateEditWorkDto,
   ): Promise<Work> {
     return this.workService.editWork(id, dto);
+  }
+
+  @Patch('edit_order')
+  updateOrderWork(
+    @Body() updateWorkOrderDto: UpdateWorkOrderDto,
+  ): Promise<Msg> {
+    return this.workService.reorderWork(updateWorkOrderDto);
   }
 }
